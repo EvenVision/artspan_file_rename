@@ -1,0 +1,6 @@
+name = Artspan File Rename
+description = Rename guide image files on upload, to be lastname_first_name_weekend_ran
+package = Artspan
+
+core = 7.x
+php = 5.2

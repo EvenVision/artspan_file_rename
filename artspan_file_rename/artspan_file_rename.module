@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * Implements hook_token_info().
+ */
+function artspan_file_rename_token_info() {
+
+  // Add tokens.
+  $info['tokens']['custom']['guide_image_name'] = array(
+    'name' => t('Guide Image Name'),
+    'description' => t('Guide Image Name'),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function artspan_file_rename_tokens($type, $tokens, array $data = array(), array $options = array()) {
+
+	$replacements = array();
+	$sanitize = !empty($options['sanitize']);
+
+	if ($type == 'custom' && !empty($data['node'])) {
+		foreach ($tokens as $name => $original) {
+		  switch ($name) {
+		    case 'guide_image_name':
+		    	$node = $data['node'];
+		    	$uid = $node->uid;
+
+				civicrm_initialize();
+
+				try {
+					$contact_id = civicrm_api3('UFMatch', 'getvalue', array(
+					  'return' => 'contact_id',
+					  'uf_id' => $uid,
+					));
+
+					$result = civicrm_api3('Contact', 'getsingle', array(
+					  'id' => $contact_id,
+					));
+
+					$num = rand(6,100);
+					$first_name = $result['first_name'];
+					$last_name = $result['last_name'];
+					$last_name = str_replace(' ', '', $last_name);
+					$last_name = str_replace(',', '', $last_name);
+					$last_name = str_replace('.', '', $last_name);
+					$first_name = str_replace(' ', '', $first_name);
+					$first_name = str_replace(',', '', $first_name);
+					$first_name = str_replace('.', '', $first_name);
+					$last_name = str_replace('-', '', $last_name);
+					$first_name = str_replace('-', '', $first_name);
+					$first_name = preg_replace('/[^A-Za-z0-9\-]/', '', $first_name);
+					$last_name = preg_replace('/[^A-Za-z0-9\-]/', '', $last_name);
+
+					//$file_name = $first_name.'_'.$last_name.'_'.$weekend.'_'.$num;
+					$file_name = $last_name.'_'.$first_name.'_'.$num;
+				}
+				catch (Exception $e) {
+				  $file_name = 'error';
+				}
+		   
+		        $replacements[$original] = $file_name;
+		    break;
+		}
+	}
+
+	// Return the replacements.
+	return $replacements;
+	}
+}
