@@ -28,6 +28,12 @@ function artspan_file_rename_tokens($type, $tokens, array $data = array(), array
 		    case 'guide_image_name':
 		    	$node = $data['node'];
 		    	$uid = $node->uid;
+          $event_id = $node->field_guide_image_studio_event[LANGUAGE_NONE][0]["target_id"];
+          $event = node_load($event_id);
+          $weekend = 'w';
+          if (isset($event->field_studioevent_weekend)) {
+            $weekend .= $event->field_studioevent_weekend[LANGUAGE_NONE][0]['value'];
+          }
 
 				civicrm_initialize();
 
@@ -55,13 +61,12 @@ function artspan_file_rename_tokens($type, $tokens, array $data = array(), array
 					$first_name = preg_replace('/[^A-Za-z0-9\-]/', '', $first_name);
 					$last_name = preg_replace('/[^A-Za-z0-9\-]/', '', $last_name);
 
-					//$file_name = $first_name.'_'.$last_name.'_'.$weekend.'_'.$num;
-					$file_name = $last_name.'_'.$first_name.'_'.$num;
+					$file_name = $last_name . '_' . $first_name . '_' . $weekend . '_' . $num;
 				}
 				catch (Exception $e) {
 				  $file_name = 'error';
 				}
-		   
+
 		        $replacements[$original] = $file_name;
 		    break;
 		}
